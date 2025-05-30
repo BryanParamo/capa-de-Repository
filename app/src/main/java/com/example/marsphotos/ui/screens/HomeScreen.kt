@@ -15,10 +15,11 @@
  */
 package com.example.marsphotos.ui.screens
 
+import androidx.compose.foundation.layout.height
+import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -31,10 +32,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.example.marsphotos.R
 import com.example.marsphotos.model.MarsPhoto
 import com.example.marsphotos.ui.theme.MarsPhotosTheme
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import coil.compose.rememberAsyncImagePainter
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+
+
+
 
 @Composable
 fun HomeScreen(
@@ -74,15 +88,57 @@ fun ErrorScreen(modifier: Modifier = Modifier) {
     }
 }
 
+
+
+
 @Composable
-fun ResultScreen(photos: String, modifier: Modifier = Modifier) {
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = modifier
+fun ResultScreen(photos: List<MarsPhoto>, modifier: Modifier = Modifier) {
+    LazyColumn(
+        modifier = modifier,
+        contentPadding = PaddingValues(8.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Text(text = photos)
+        items(photos) { photo ->
+            Column(
+                modifier = Modifier
+                    .padding(horizontal = 8.dp)
+                    .border(
+                        width = 3.dp,
+                        color = Color.White,
+                        shape = RoundedCornerShape(16.dp)
+                    )
+                    .clip(RoundedCornerShape(16.dp))
+            ) {
+                Image(
+                    painter = rememberAsyncImagePainter(photo.imgSrc),
+                    contentDescription = "Mars photo",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(250.dp)
+                        .background(Color.Black) // Fondo negro si la imagen no carga
+                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.Black)
+                        .padding(vertical = 8.dp)
+                ) {
+                    Text(
+                        text = photo.id,
+                        color = Color(0xFFFFEB3B), // Amarillo brillante
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
+            }
+        }
     }
 }
+
+
+
+
 
 @Preview(showBackground = true)
 @Composable
@@ -104,7 +160,8 @@ fun ErrorScreenPreview() {
 @Composable
 fun PhotosGridScreenPreview() {
     MarsPhotosTheme {
-        val mockData = List(10) { MarsPhoto("$it", "") }
-        ResultScreen(stringResource(R.string.placeholder_success))
+        val mockData = List(10) { MarsPhoto("$it", "https://mars.nasa.gov/system/news_items/main_images/9442_PIA25681-FigureA-web.jpg") }
+        ResultScreen(mockData)
     }
 }
+

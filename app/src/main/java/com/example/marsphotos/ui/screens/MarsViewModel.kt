@@ -21,6 +21,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.marsphotos.data.MarsPhotosRepository
+import com.example.marsphotos.model.MarsPhoto
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
@@ -28,7 +29,7 @@ import java.io.IOException
 import javax.inject.Inject
 
 sealed interface MarsUiState {
-    data class Success(val photos: String) : MarsUiState
+    data class Success(val photos: List<MarsPhoto>) : MarsUiState
     object Error : MarsUiState
     object Loading : MarsUiState
 }
@@ -50,7 +51,7 @@ class MarsViewModel @Inject constructor(
             marsUiState = MarsUiState.Loading
             marsUiState = try {
                 val listResult = marsPhotosRepository.getMarsPhotos()
-                MarsUiState.Success("Success: ${listResult.size} Mars photos retrieved")
+                MarsUiState.Success(listResult) // <- aquí envías la lista
             } catch (e: IOException) {
                 MarsUiState.Error
             } catch (e: HttpException) {
@@ -59,3 +60,4 @@ class MarsViewModel @Inject constructor(
         }
     }
 }
+
